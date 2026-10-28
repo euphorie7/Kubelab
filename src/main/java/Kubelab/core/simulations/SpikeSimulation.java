@@ -4,28 +4,32 @@ import io.gatling.javaapi.core.Simulation;
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.*;
 
-
-
+import java.util.Properties;
+import java.io.InputStream;
+import java.io.IOException;
 public class SpikeSimulation extends Simulation {
 
-    String baseUrl = System.getenv()
-        .getOrDefault("TARGET_URL", "http://localhost:8080");
 
-    String endpoint = System.getenv()
-        .getOrDefault("TARGET_ENDPOINT", "/api/compute");
+    public SpikeSimulation()  throws IOException{
 
-    int minUsers = Integer.parseInt(
-        System.getenv().getOrDefault("MIN_LOAD_USERS", "10")
-    );
-    int maxUsers = Integer.parseInt(
-        System.getenv().getOrDefault("MAX_LOAD_USERS", "200")
-    );
+        Properties props = new Properties();
 
-    int duration = Integer.parseInt(
-        System.getenv().getOrDefault("LOAD_DURATION", "180")
-    );
+        try (InputStream input = getClass().getClassLoader()
+                .getResourceAsStream("application.properties")) {
 
-    public LoadSimulation() {
+            if (input == null) {
+                throw new IllegalStateException("application.properties not found");
+            }
+
+            props.load(input);
+        }
+        
+        String baseUrl = props.getProperty("TARGET_URL");
+        String endpoint = props.getProperty("COMPUTE_ENDPOINT");
+
+        int minUsers = Integer.parseInt(props.getProperty("MIN_LOAD_USERS"));
+        int maxUsers = Integer.parseInt(props.getProperty("MAX_LOAD_USERS"));
+        int duration = Integer.parseInt(props.getProperty("LOAD_DURATION"));
 
         setUp(
             scenario("KubeLab Spike Test")
