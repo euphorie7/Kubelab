@@ -41,7 +41,7 @@ public class ProducerSimulation extends Simulation {
                         .header("Content-Type", "application/json")
                         .body(StringBody("""
                             {
-                                "eventId": "#{randomUuid()}",
+                                "key": "#{randomUuid()}",
                                 "type": "LOAD_TEST",
                                 "source": "KubeLab",
                                 "message": "Performance testing event"
