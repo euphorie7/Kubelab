@@ -1,0 +1,85 @@
+apiVersion : apps/v1
+kind : Deployment
+
+metadata : 
+  name : kafka
+  namespace : kafkalab
+
+spec : 
+  replicas : 1 
+  selector : 
+    matchLabels : 
+      app: kafka
+  template : 
+
+    metadata : 
+      labels : 
+        app : kafka
+    
+    spec : 
+
+      containers : 
+        - name : kafka
+
+          image: apache/kafka:4.1.1
+          imagePullPolicy: IfNotPresent
+
+          ports : 
+            #kraft
+            - containerPort : 9093
+            # interne :	Communication avec Producer, Consumer et Kafka UI dans Kubernetes
+            - containerPort : 5000
+            # externe : Coommunication avec ma machine Ubuntu
+            - containerPort : 6000
+
+          env : 
+
+          - name: CLUSTER_ID
+            value: "HW17MREZQPWvqjmJqTSS3Q"
+
+          - name : KAFKA_NODE_ID 
+            value  : "1"
+
+          - name : KAFKA_PROCESS_ROLES 
+            value  : "broker,controller"
+
+          - name : KAFKA_CONTROLLER_QUORUM_VOTERS 
+            # le broker et contrôleur dans le même conteneur
+            value  : "1@localhost:9093"
+
+          - name : KAFKA_LISTENERS 
+            value  : "POD://:5000,EXTERN://:6000,KRAFT://:9093"
+
+          - name : KAFKA_CONTROLLER_LISTENER_NAMES 
+            value  : "KRAFT"
+
+          - name : KAFKA_INTER_BROKER_LISTENER_NAME 
+            value  : "POD"
+
+          - name : KAFKA_ADVERTISED_LISTENERS 
+            # il faut declarer kafka-dns dans service
+            # avec deployement 6000:6000 les deux localhost du node et ma machine seront lie( DNS client )!!
+            value  : "POD://kafka-dns:5000,EXTERN://localhost:6000"
+
+          - name : KAFKA_LISTENER_SECURITY_PROTOCOL_MAP 
+            value  : "POD:PLAINTEXT,EXTERN:PLAINTEXT,KRAFT:PLAINTEXT"
+
+          - name : KAFKA_AUTO_CREATE_TOPICS_ENABLE 
+            value  : "false"
+
+          - name : KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR 
+            value  : "1"
+
+          - name : KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR 
+            value  : "1"
+
+          - name : KAFKA_TRANSACTION_STATE_LOG_MIN_ISR 
+            value  : "1"
+
+          - name : KAFKA_DEFAULT_REPLICATION_FACTOR 
+            value  : "1"
+
+
+
+
+

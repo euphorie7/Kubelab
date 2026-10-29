@@ -1,0 +1,20 @@
+apiVersion : v1
+kind : Service 
+metadata:
+  name: kafka-dns
+  namespace: kafkalab
+
+
+spec : 
+  type : ClusterIP
+  selector : 
+    app : kafka
+
+  ports : 
+     # les client contacte le service via le port 
+    - port: 5000
+      # Port du Pod kafka vers lequel le service transmet les connexions
+      targetPort:  5000
+      protocol : TCP
+
+
